@@ -10,14 +10,14 @@ uniform sampler2D texture0;
 // Output fragment color
 out vec4 finalColor;
 
-uniform vec2 renderSize;
-uniform float pixelWidth = 5.0;
-uniform float pixelHeight = 5.0;
+uniform vec2 u_render_size;
+uniform float u_time;
 
 void main()
 {
-    float dx = pixelWidth*(1.0/renderSize[0]);
-    float dy = pixelHeight*(1.0/renderSize[1]);
+    float pixelSize = 2 * sqrt(abs(sin(u_time))) + 3;
+    float dx = pixelSize*(1.0/u_render_size[0]);
+    float dy = pixelSize*(1.0/u_render_size[1]);
 
     vec2 coord = vec2(dx*floor(fragTexCoord.x/dx), dy*floor(fragTexCoord.y/dy));
     

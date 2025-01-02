@@ -105,11 +105,7 @@ int main(void)
     Texture2D mandelbrotTexture = getMandelbrotTexture(screenWidth, screenHeight);
     RenderTexture2D target = LoadRenderTexture(screenWidth, screenHeight);
 
-    // Change pixel size for animation
-    float pixelSizeMax = 5.0;
-    float pixelSizeMin = 3.0;
-    float pixelWidth = 3.0;
-    int pixelChangeDirection = 1;
+    float pixelTime = 0.0;
 
     SetTargetFPS(60);
 
@@ -136,19 +132,6 @@ int main(void)
             mandelbrotTexture = newMandelbrotTexture;
         }
 
-        // Animate pixels
-        pixelWidth = (pixelWidth + (0.001 * pixelChangeDirection));
-        if (pixelWidth > pixelSizeMax)
-        {
-            pixelWidth = pixelSizeMax;
-            pixelChangeDirection *= -1;
-        }
-        else if (pixelWidth <= pixelSizeMin)
-        {
-            pixelWidth = pixelSizeMin;
-            pixelChangeDirection *= -1;
-        }
-
         BeginTextureMode(target);
         {
             ClearBackground(RAYWHITE);
@@ -161,20 +144,19 @@ int main(void)
             BeginShaderMode(shader);
             {
                 // Pixelization Shader
-                int pixWidthLoc = GetShaderLocation(shader, "pixelWidth");
-                int pixHeightLoc = GetShaderLocation(shader, "pixelHeight");
-                int renderSizeLoc = GetShaderLocation(shader, "renderSize");
+                int pixelTimeLoc = GetShaderLocation(shader, "u_time");
+                int renderSizeLoc = GetShaderLocation(shader, "u_render_size");
                 float screenSizeVec[2] = {screenWidth, screenHeight};
-                SetShaderValue(shader, pixWidthLoc, &pixelWidth, SHADER_UNIFORM_FLOAT);
-                SetShaderValue(shader, pixHeightLoc, &pixelWidth, SHADER_UNIFORM_FLOAT);
+                SetShaderValue(shader, pixelTimeLoc, &pixelTime, SHADER_UNIFORM_FLOAT);
                 SetShaderValue(shader, renderSizeLoc, screenSizeVec, SHADER_UNIFORM_VEC2);
-
                 DrawTextureRec(target.texture, (Rectangle){0, 0, (float)target.texture.width, (float)target.texture.height}, (Vector2){0, 0}, WHITE);
             }
             EndShaderMode();
             // DrawText(currentShaderText, 190, 50, 20, LIGHTGRAY);
         }
         EndDrawing();
+
+        pixelTime += 0.001;
     }
 
     // Cleanup
